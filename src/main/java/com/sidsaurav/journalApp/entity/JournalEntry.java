@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class JournalEntry {
 
     @Id
-//    @JsonSerialize(using = ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId id;
     private String title;
     private String body;
