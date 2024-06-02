@@ -4,6 +4,8 @@ package com.sidsaurav.journalApp.controller;
 import com.sidsaurav.journalApp.entity.JournalEntry;
 import com.sidsaurav.journalApp.repository.JournalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -37,13 +39,14 @@ public class JournalController {
 
     // DELETE ONE
     @DeleteMapping("/journal/{id}")
-    public String deleteJournal(@PathVariable String id) {
-        try{
-            journalRepo.deleteById(id);
-            return "Journal Deleted Successfully";
+    public ResponseEntity<String> deleteJournal(@PathVariable String id) {
+        var item = journalRepo.findById(id);
+        if(item.isEmpty()){
+            return new ResponseEntity<>("Item not found", HttpStatus.ACCEPTED);
         }
-        catch(Exception e){
-            return e.getMessage();
+        else{
+            journalRepo.deleteById(id);
+            return new ResponseEntity<>("deleted", HttpStatus.ACCEPTED);
         }
     }
 }

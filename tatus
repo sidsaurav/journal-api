@@ -1,0 +1,106 @@
+[33mcommit baad6fceef0509a1f7dd29f206585a753c884e6b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: Siddharth Saurav <sid.saurav11@gmail.com>
+Date:   Sun Jun 2 14:20:06 2024 +0530
+
+    add delete endpoint
+
+[1mdiff --git a/pom.xml b/pom.xml[m
+[1mindex 7957d23..0d86afe 100644[m
+[1m--- a/pom.xml[m
+[1m+++ b/pom.xml[m
+[36m@@ -39,6 +39,12 @@[m
+ 			<artifactId>spring-boot-devtools</artifactId>[m
+ 			<optional>true</optional>[m
+ 		</dependency>[m
+[32m+[m		[32m<dependency>[m
+[32m+[m			[32m<groupId>org.jetbrains</groupId>[m
+[32m+[m			[32m<artifactId>annotations</artifactId>[m
+[32m+[m			[32m<version>RELEASE</version>[m
+[32m+[m			[32m<scope>compile</scope>[m
+[32m+[m		[32m</dependency>[m
+ 	</dependencies>[m
+ [m
+ 	<build>[m
+[1mdiff --git a/src/main/java/com/sidsaurav/journalApp/controller/Journal.java b/src/main/java/com/sidsaurav/journalApp/controller/JournalController.java[m
+[1msimilarity index 63%[m
+[1mrename from src/main/java/com/sidsaurav/journalApp/controller/Journal.java[m
+[1mrename to src/main/java/com/sidsaurav/journalApp/controller/JournalController.java[m
+[1mindex f62fcb4..2bc5629 100644[m
+[1m--- a/src/main/java/com/sidsaurav/journalApp/controller/Journal.java[m
+[1m+++ b/src/main/java/com/sidsaurav/journalApp/controller/JournalController.java[m
+[36m@@ -6,28 +6,44 @@[m [mimport com.sidsaurav.journalApp.repository.JournalRepository;[m
+ import org.springframework.beans.factory.annotation.Autowired;[m
+ import org.springframework.web.bind.annotation.*;[m
+ [m
+[32m+[m[32mimport java.time.LocalDateTime;[m
+ import java.util.List;[m
+ [m
+ [m
+ @RestController[m
+[31m-public class Journal {[m
+[32m+[m[32mpublic class JournalController {[m
+ [m
+     @Autowired[m
+     private JournalRepository journalRepo;[m
+ [m
+[32m+[m[32m    // GET ALL[m
+     @GetMapping("/journals")[m
+     public List<JournalEntry> getAllJournalEntries(){[m
+         return journalRepo.findAll();[m
+     }[m
+ [m
+[32m+[m[32m    // GET ONE[m
+     @GetMapping("/journal/{id}")[m
+     public JournalEntry getJournalById(@PathVariable String id) {[m
+         return journalRepo.findById(id).orElse(null);[m
+     }[m
+ [m
+[32m+[m[32m    // POST ONE[m
+     @PostMapping("/journal")[m
+[31m-    public JournalEntry postJournal(@RequestBody JournalEntry req) {[m
+[32m+[m[32m    public JournalEntry postJournal(@RequestBody JournalEntry req){[m
+[32m+[m[32m        req.setCreated_at(LocalDateTime.now());[m
+         return journalRepo.save(req);[m
+     }[m
+ [m
+[32m+[m[32m    // DELETE ONE[m
+[32m+[m[32m    @DeleteMapping("/journal/{id}")[m
+[32m+[m[32m    public String deleteJournal(@PathVariable String id) {[m
+[32m+[m[32m        try{[m
+[32m+[m[32m            journalRepo.deleteById(id);[m
+[32m+[m[32m            return "Journal Deleted Successfully";[m
+[32m+[m[32m        }[m
+[32m+[m[32m        catch(Exception e){[m
+[32m+[m[32m            return e.getMessage();[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+ }[m
+[1mdiff --git a/src/main/java/com/sidsaurav/journalApp/entity/JournalEntry.java b/src/main/java/com/sidsaurav/journalApp/entity/JournalEntry.java[m
+[1mindex 87020c0..91c321d 100644[m
+[1m--- a/src/main/java/com/sidsaurav/journalApp/entity/JournalEntry.java[m
+[1m+++ b/src/main/java/com/sidsaurav/journalApp/entity/JournalEntry.java[m
+[36m@@ -12,7 +12,7 @@[m [mimport java.time.LocalDateTime;[m
+ public class JournalEntry {[m
+ [m
+     @Id[m
+[31m-//    @JsonSerialize(using = ToStringSerializer.class)[m
+[32m+[m[32m    @JsonSerialize(using = ToStringSerializer.class)[m
+     private ObjectId id;[m
+     private String title;[m
+     private String body;[m
+[1mdiff --git a/src/test/java/com/sidsaurav/journalApp/JournalAppApplicationTests.java b/src/test/java/com/sidsaurav/journalApp/JournalControllerAppApplicationTests.java[m
+[1msimilarity index 80%[m
+[1mrename from src/test/java/com/sidsaurav/journalApp/JournalAppApplicationTests.java[m
+[1mrename to src/test/java/com/sidsaurav/journalApp/JournalControllerAppApplicationTests.java[m
+[1mindex 9724bbc..6b8b858 100644[m
+[1m--- a/src/test/java/com/sidsaurav/journalApp/JournalAppApplicationTests.java[m
+[1m+++ b/src/test/java/com/sidsaurav/journalApp/JournalControllerAppApplicationTests.java[m
+[36m@@ -4,7 +4,7 @@[m [mimport org.junit.jupiter.api.Test;[m
+ import org.springframework.boot.test.context.SpringBootTest;[m
+ [m
+ @SpringBootTest[m
+[31m-class JournalAppApplicationTests {[m
+[32m+[m[32mclass JournalControllerAppApplicationTests {[m
+ [m
+ 	@Test[m
+ 	void contextLoads() {[m
